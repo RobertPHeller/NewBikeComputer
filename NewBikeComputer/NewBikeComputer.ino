@@ -8,7 +8,7 @@
 //  Author        : $Author$
 //  Created By    : Robert Heller
 //  Created       : Thu Jun 30 15:03:26 2022
-//  Last Modified : <220701.1410>
+//  Last Modified : <220701.1456>
 //
 //  Description	
 //
@@ -47,16 +47,21 @@ static const char rcsid[] = "@(#) : $Id$";
 #include <Adafruit_GFX.h>    // Core graphics library
 #include <Adafruit_ST7789.h> // Hardware-specific library for ST7789
 #include <SPI.h>
+#include <Adafruit_GPS.h>
+#include <HardwareSerial.h>
 #include "Wheelsensor.h"
 #include "Button.h"
 #include "Modes.h"
-//#include "SerialCLI.h"
+#include "SerialCLI.h"
 
 const uint8_t BUTTON2 = 9;
 const uint8_t BUTTON3 = 6;
 const uint8_t MODE  = 5;
 const uint8_t WHEEL = 10;
 const uint8_t BATTERY = A5;
+
+Adafruit_GPS GPS(&Serial0);
+
 
 ModeButton b1(MODE);
 Button b2(BUTTON2);
@@ -70,6 +75,19 @@ const float VScale = (3.3*14.0)/4095.0;
 
 void setup() {
     // put your setup code here, to run once:
+    // Initialize serial first (so we can debug stuff)
+    Serial.begin(115200);
+    Serial.println("BikeComputer 0.0");
+    Serial.print(">>");
+    Serial.flush();
+    // 9600 NMEA is the default baud rate for Adafruit MTK GPS's- some use 4800
+    GPS.begin(9600);
+    GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCGGA);
+    // Set the update rate
+    GPS.sendCommand(PMTK_SET_NMEA_UPDATE_1HZ);   // 1 Hz update rate
+    delay(1000);
+    Serial0.println(PMTK_Q_RELEASE);
+    
     WheelSensor.init();
     //analogReference(DEFAULT);
     // turn on backlite
@@ -91,7 +109,9 @@ void loop() {
     float VBatt = analogRead(BATTERY) * VScale;
     int   VBint = (int)VBatt;
     int   VBfract = (int)((VBatt - VBint)*10);
-    
+    if (Serial.available() > 0) {
+        ProcessSerialCLI();
+    }
     // put your main code here, to run repeatedly:
     if (WheelSensor.CheckState()) {
         int speed = WheelSensor.CurrentSpeed();
