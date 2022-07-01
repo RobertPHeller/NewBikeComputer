@@ -8,7 +8,7 @@
 //  Author        : $Author$
 //  Created By    : Robert Heller
 //  Created       : Thu Jun 30 15:03:26 2022
-//  Last Modified : <220630.1503>
+//  Last Modified : <220701.1254>
 //
 //  Description	
 //
@@ -42,10 +42,39 @@
 
 static const char rcsid[] = "@(#) : $Id$";
 
+#include <Arduino.h>
+#include <stdio.h>
+#include "Wheelsensor.h"
+#include "Button.h"
+#include "Modes.h"
+//#include "SerialCLI.h"
+
+const uint8_t BUTTON2 = 9;
+const uint8_t BUTTON3 = 6;
+const uint8_t MODE  = 5;
+const uint8_t WHEEL = 10;
+const uint8_t BATTERY = A5;
+
+ModeButton b1(MODE);
+Button b2(BUTTON2);
+Button b3(BUTTON3);
+Wheelsensor WheelSensor(WHEEL);
+
+const float VScale = (3.3*14.0)/4095.0;
+
 void setup() {
     // put your setup code here, to run once:
+    WheelSensor.init();
+    //analogReference(DEFAULT);
 }
                 
 void loop() {
+    float VBatt = analogRead(BATTERY) * VScale;
+    int   VBint = (int)VBatt;
+    int   VBfract = (int)((VBatt - VBint)*10);
+    
     // put your main code here, to run repeatedly:
+    if (WheelSensor.CheckState()) {
+        int speed = WheelSensor.CurrentSpeed();
+    }
 }    
