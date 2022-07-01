@@ -8,7 +8,7 @@
 //  Author        : $Author$
 //  Created By    : Robert Heller
 //  Created       : Thu Jun 30 15:03:26 2022
-//  Last Modified : <220701.1254>
+//  Last Modified : <220701.1410>
 //
 //  Description	
 //
@@ -44,6 +44,9 @@ static const char rcsid[] = "@(#) : $Id$";
 
 #include <Arduino.h>
 #include <stdio.h>
+#include <Adafruit_GFX.h>    // Core graphics library
+#include <Adafruit_ST7789.h> // Hardware-specific library for ST7789
+#include <SPI.h>
 #include "Wheelsensor.h"
 #include "Button.h"
 #include "Modes.h"
@@ -60,12 +63,28 @@ Button b2(BUTTON2);
 Button b3(BUTTON3);
 Wheelsensor WheelSensor(WHEEL);
 
+// Use dedicated hardware SPI pins
+Adafruit_ST7789 tft = Adafruit_ST7789(TFT_CS, TFT_DC, TFT_RST);
+
 const float VScale = (3.3*14.0)/4095.0;
 
 void setup() {
     // put your setup code here, to run once:
     WheelSensor.init();
     //analogReference(DEFAULT);
+    // turn on backlite
+    pinMode(TFT_BACKLITE, OUTPUT);
+    digitalWrite(TFT_BACKLITE, HIGH);
+    
+    // turn on the TFT / I2C power supply
+    pinMode(TFT_I2C_POWER, OUTPUT);
+    digitalWrite(TFT_I2C_POWER, HIGH);
+    delay(10);
+    
+    // initialize TFT
+    tft.init(135, 240); // Init ST7789 240x135
+    tft.setRotation(3);
+    tft.fillScreen(ST77XX_BLACK);
 }
                 
 void loop() {
