@@ -8,7 +8,7 @@
 //  Author        : $Author$
 //  Created By    : Robert Heller
 //  Created       : Thu Jun 30 15:03:26 2022
-//  Last Modified : <220701.1456>
+//  Last Modified : <220702.0937>
 //
 //  Description	
 //
@@ -48,6 +48,7 @@ static const char rcsid[] = "@(#) : $Id$";
 #include <Adafruit_ST7789.h> // Hardware-specific library for ST7789
 #include <SPI.h>
 #include <Adafruit_GPS.h>
+//#include <SoftwareSerial.h>
 #include <HardwareSerial.h>
 #include "Wheelsensor.h"
 #include "Button.h"
@@ -60,6 +61,7 @@ const uint8_t MODE  = 5;
 const uint8_t WHEEL = 10;
 const uint8_t BATTERY = A5;
 
+//SoftwareSerial mySerial(RX,TX);
 Adafruit_GPS GPS(&Serial0);
 
 
