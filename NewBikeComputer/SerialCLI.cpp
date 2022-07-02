@@ -8,7 +8,7 @@
 //  Author        : $Author$
 //  Created By    : Robert Heller
 //  Created       : Sun Sep 15 17:56:32 2013
-//  Last Modified : <220701.1427>
+//  Last Modified : <220702.1148>
 //
 //  Description	
 //
@@ -88,3 +88,4 @@ void ProcessSerialCLI()
     }
 }               
             
+int TZOffset = 0;

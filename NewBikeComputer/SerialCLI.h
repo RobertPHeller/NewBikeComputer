@@ -8,7 +8,7 @@
 //  Author        : $Author$
 //  Created By    : Robert Heller
 //  Created       : Sun Sep 15 17:54:59 2013
-//  Last Modified : <131012.2045>
+//  Last Modified : <220702.1147>
 //
 //  Description	
 //
@@ -34,6 +34,8 @@
 void ProcessSerialCLI();
 
 typedef enum {SET='S', UPLOAD='U', CLEAR='C', HELP='H'} Commands;
+
+extern int TZOffset;
 
 #endif // __SERIALCLI_H
 
