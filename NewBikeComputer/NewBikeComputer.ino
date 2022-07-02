@@ -8,7 +8,7 @@
 //  Author        : $Author$
 //  Created By    : Robert Heller
 //  Created       : Thu Jun 30 15:03:26 2022
-//  Last Modified : <220702.1302>
+//  Last Modified : <220702.1521>
 //
 //  Description	
 //
@@ -83,7 +83,9 @@ void setup() {
     Serial.print(">>");
     Serial.flush();
     // 9600 NMEA is the default baud rate for Adafruit MTK GPS's- some use 4800
-    GPS.begin(9600);
+    Serial1.begin(9600,SERIAL_8N1,RX,TX);
+    delay(10);
+    //GPS.begin(9600);
     GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCGGA);
     // Set the update rate
     GPS.sendCommand(PMTK_SET_NMEA_UPDATE_1HZ);   // 1 Hz update rate
@@ -192,13 +194,12 @@ void loop() {
                 if (date < 1)
                 {
                     month -= 1;
-                    date = DaysInMonth(month,year);
                     if (month < 1)
                     {
                         year -= 1;
                         month = 12;
-                        date = DaysInMonth(month,year);
                     }
+                    date = DaysInMonth(month,year);
                 }
             } else if (hours >= 24)
             {
