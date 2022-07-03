@@ -8,7 +8,7 @@
 //  Author        : $Author$
 //  Created By    : Robert Heller
 //  Created       : Sun Sep 15 17:54:59 2013
-//  Last Modified : <220702.1147>
+//  Last Modified : <220703.1733>
 //
 //  Description	
 //
@@ -31,11 +31,14 @@
 #ifndef __SERIALCLI_H
 #define __SERIALCLI_H
 
-void ProcessSerialCLI();
+#include "PersistentTripDatabase.h"
+#include "BikeNVS.h"
+#include "Wheelsensor.h"
 
-typedef enum {SET='S', UPLOAD='U', CLEAR='C', HELP='H'} Commands;
+void ProcessSerialCLI(PersistentTripDatabase *PTD,BikeNVS *NVS,
+                      Wheelsensor *wheel);
 
-extern int TZOffset;
+typedef enum {SET='S', UPLOAD='U', CLEAR='C', ZERO='Z', HELP='H'} Commands;
 
 #endif // __SERIALCLI_H
 

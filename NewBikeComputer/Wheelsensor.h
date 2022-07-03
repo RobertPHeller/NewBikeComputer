@@ -8,7 +8,7 @@
 //  Author        : $Author$
 //  Created By    : Robert Heller
 //  Created       : Sun Sep 15 11:29:23 2013
-//  Last Modified : <220701.1224>
+//  Last Modified : <220703.1738>
 //
 //  Description	
 //
@@ -37,7 +37,7 @@ public:
     bool CheckState();
     int CurrentSpeed() {return curspeed;}
     float Miles() {return totalmiles;}
-    void init();
+    void init(float miles = 0.0);
     void ZeroMiles() {totalmiles=0.0;}
 private:
     volatile static int rotationcount;

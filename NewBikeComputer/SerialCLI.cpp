@@ -8,7 +8,7 @@
 //  Author        : $Author$
 //  Created By    : Robert Heller
 //  Created       : Sun Sep 15 17:56:32 2013
-//  Last Modified : <220702.1148>
+//  Last Modified : <220703.1735>
 //
 //  Description	
 //
@@ -34,6 +34,9 @@ static const char rcsid[] = "@(#) : $Id$";
 #include <stdio.h>
 #include "SerialCLI.h"
 #include <ctype.h>
+#include "PersistentTripDatabase.h"
+#include "BikeNVS.h"
+#include "Wheelsensor.h"
 
 static const char *HelpText[] = {
     "New Bike Computer 1.0",
@@ -46,13 +49,16 @@ static const char *HelpText[] = {
     "  Upload tripfile",
     "C",
     "  Clear tripfile",
+    "Z",
+    "  Zero NVS (miles, tzoffset)", 
     "H",
     "  Print this help",
     "",
     NULL
 };
 
-void ProcessSerialCLI()
+void ProcessSerialCLI(PersistentTripDatabase *PTD,BikeNVS *NVS,
+                      Wheelsensor *wheel)
 {
     char buffer[256];
     int len;
@@ -64,12 +70,19 @@ void ProcessSerialCLI()
         switch ((Commands) (toupper(buffer[0]))) {
         case SET:
             {
+                break;
             }
         case CLEAR:
             {
+                break;
             }
         case UPLOAD:
             {
+                break;
+            }
+        case ZERO:
+            {
+                break;
             }
         case HELP:
             {
@@ -88,4 +101,3 @@ void ProcessSerialCLI()
     }
 }               
             
-int TZOffset = 0;

@@ -8,7 +8,7 @@
 //  Author        : $Author$
 //  Created By    : Robert Heller
 //  Created       : Sun Sep 15 11:35:09 2013
-//  Last Modified : <220701.1226>
+//  Last Modified : <220703.1643>
 //
 //  Description	
 //
@@ -40,10 +40,10 @@ static const char rcsid[] = "@(#) : $Id$";
 
 volatile int Wheelsensor::rotationcount = 0;
 
-void Wheelsensor::init()
+void Wheelsensor::init(float miles)
 {
     lasttime = 0;
-    totalmiles = 0;
+    totalmiles = miles;
     curspeed = 0;
     rotationcount = 0;
     attachInterrupt(digitalPinToInterrupt(pin_), count_rotation, RISING);
