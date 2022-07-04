@@ -54,7 +54,7 @@ case $target_cpu in
         AC_SUBST(TCLKITRUN, [tclkit-8.6.11-x86_64-Img1.4.7])
         ;;
     i*86)
-        AC_SUBST(TCLKITRUN, [tclkit-8.6.11-i386-Img1.4.7)
+        AC_SUBST(TCLKITRUN, [tclkit-8.6.11-i386-Img1.4.7])
         ;;
     arm*)
         AC_SUBST(TCLKITRUN, [tclkit-8.6.11-armv7l-Img1.4.8])

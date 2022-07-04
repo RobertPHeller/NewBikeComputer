@@ -38,7 +38,6 @@ BikeHost$(EXEEXT): Scripts/BikeHost.tcl $(BikeHostDATA) html/index.html
 	$(TCLKIT) $(SDX) qwrap $(srcdir)/Scripts/BikeHost.tcl
 	$(TCLKIT) $(SDX) unwrap BikeHost.kit
 	-rm -f BikeHost.kit
-	tar xjf $(top_srcdir)/BuildData/$(IMG_TARBZ) -C BikeHost.vfs/lib
 	$(TCLKIT) $(AddKitDir) BikeHost lib $(SNITLIB)
 	$(TCLKIT) $(AddKitFile) -srcdir $(srcdir) BikeHost \
 		lib/Common $(BikeHostDATA)
@@ -60,6 +59,9 @@ refman.pdf : latex/refman.tex
 	$(MAKE) -C latex refman.pdf
 		-cp latex/refman.pdf ./
                 
+BuildData/tclkit : FORCE
+	$(MAKE) -C BuildData tclkit
+	
 FORCE:
 
 clean-local:
