@@ -8,7 +8,7 @@
 #  Author        : $Author$
 #  Created By    : Robert Heller
 #  Created       : Sun Mar 9 11:13:09 2014
-#  Last Modified : <140310.1018>
+#  Last Modified : <220704.1253>
 #
 #  Description	
 #
@@ -62,9 +62,10 @@ pack .mainframe -expand yes -fill both
 $Main showstatusbar status
 set Toolbar [$Main addtoolbar]
 $Main showtoolbar 0 yes
-pack [ttk::button $Toolbar.settime -text "Set Time" -command {Port SetTime} -state disabled] -side left
-pack [ttk::button $Toolbar.clearsram -text "Clear Stored Trips" -command {Port ClearSRam} -state disabled] -side left
-pack [ttk::button $Toolbar.uploadsram -text "Upload Stored Trips" -command {Port UploadTrips} -state disabled] -side left
+pack [ttk::button $Toolbar.settz -text "Set TimeZone" -command {Port SetTimeZone} -state disabled] -side left
+pack [ttk::button $Toolbar.cleartrips -text "Clear Stored Trips" -command {Port ClearTrips} -state disabled] -side left
+pack [ttk::button $Toolbar.uploadtrips -text "Upload Stored Trips" -command {Port UploadTrips} -state disabled] -side left
+pack [ttk::button $Toolbar.zeronvs -text "Zero NVS" -command {Port ZeroNVS} -state disabled] -side left
 set uframe [$Main getframe]
 set sw [ScrolledWindow $uframe.sw -scrollbar vertical -auto vertical]
 pack $sw -expand yes -fill both
@@ -95,7 +96,7 @@ snit::type Port {
     pragma -hastypedestroy no
     pragma -hasinstances   no
 
-    typevariable BikeComputerTTYPattern /dev/ttyACM*
+    typevariable BikeComputerTTYPattern /dev/ttyUSB*
     typecomponent portSelectDialog
     typecomponent   selectedPort
     typevariable portfd {}
@@ -180,16 +181,15 @@ snit::type Port {
             $tb configure -state normal
         }
     }
-    typemethod SetTime {} {
+    typemethod SetTimeZone {} {
         global Log
         while {!$_ready} {update}
-        set cmd [clock format [clock scan now] \
-                      -format {S %m/%d/%Y %H:%M:%S}]
+        set cmd [format {S %s} [exec date +%:::z]]
         $Log insert end "$cmd\n"
         set _ready no
         puts $portfd "$cmd"
     }
-    typemethod ClearSRam {} {
+    typemethod ClearTrips {} {
         global Log
         while {!$_ready} {update}
         set cmd "C"
@@ -209,25 +209,28 @@ snit::type Port {
         while {!$_ready} {update}
         set block [$Log get $pos end]
         #puts stderr "*** $type UploadTrips: returned block is $block"
-        set buffer $block
-        set outfile [tk_getSaveFile -defaultextension .txt \
-                     -filetypes { 
-                                  {{Text Files}       {.txt}    TEXT} 
-                                  {{All Files}        *             } 
-                              } \
-                     -initialdir [pwd] \
-                     -initialfile trips.txt -parent . \
-                     -title "File to save trips in"]
-        if {$outfile eq ""} {return}
-        set outfd [open $outfile w]
-        puts $outfd [join {nvramslot month day year hr0 min0 hr1 min1 miles} ,]
-        while {[regexp {(\d):\s+(\d+)/\s*(\d+)/\s*(\d+)\s+(\d\d):(\d\d)-(\d\d):(\d\d)\s+([[:digit:].]+)\n(.*NVRam Uploaded.\n)} \
-                $buffer => nvramslot month day year hr0 min0 hr1 min1 miles rest] > 0} {
-            puts $outfd [join [list $nvramslot $month $day $year $hr0 $min0 $hr1 $min1 $miles] ,]
-            set buffer $rest
+        if {[regexp $block {--Uploading File--\nLength: ([[:digit:]]+)\n(.*)--UploadComplete--\n} $block => ContentLength buffer] > 0} {
+            set outfile [tk_getSaveFile -defaultextension .txt \
+                         -filetypes { 
+                         {{Text Files}       {.txt}    TEXT} 
+                         {{All Files}        *             } 
+                     } \
+                           -initialdir [pwd] \
+                           -initialfile trips.txt -parent . \
+                           -title "File to save trips in"]
+            if {$outfile eq ""} {return}
+            set outfd [open $outfile w]
+            puts $outfd $buffer
+            close $outfd
         }
-        close $outfd
         #puts stderr "*** $type UploadTrips: leftover is $buffer"
-        
+    }
+    typemethod ZeroNVS {} {
+        global Log
+        while {!$_ready} {update}
+        set cmd "Z"
+        $Log insert end "$cmd\n"
+        set _ready no
+        puts $portfd "$cmd"
     }
 }
