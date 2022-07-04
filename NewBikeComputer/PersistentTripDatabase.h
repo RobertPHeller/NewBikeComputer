@@ -8,7 +8,7 @@
 //  Author        : $Author$
 //  Created By    : Robert Heller
 //  Created       : Sun Jul 3 15:06:18 2022
-//  Last Modified : <220703.1657>
+//  Last Modified : <220704.1122>
 //
 //  Description	
 //
@@ -72,6 +72,8 @@ public:
         tzoffset_ = tzoffset;
     }
     int TZOffset() const {return tzoffset_;}
+    void ZeroFile(float miles);
+    void UploadFile();
 private:
     int DaysInMonth(int month,int year)
     {

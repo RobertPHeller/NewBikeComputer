@@ -8,7 +8,7 @@
 //  Author        : $Author$
 //  Created By    : Robert Heller
 //  Created       : Sun Sep 15 17:56:32 2013
-//  Last Modified : <220703.1735>
+//  Last Modified : <220704.1143>
 //
 //  Description	
 //
@@ -70,22 +70,47 @@ void ProcessSerialCLI(PersistentTripDatabase *PTD,BikeNVS *NVS,
         switch ((Commands) (toupper(buffer[0]))) {
         case SET:
             {
+                char unused;
+                int tz = 0;
+                if (sscanf(buffer,"%c %d",&unused,&tz) != 2) {
+                    Serial.println("Syntax error!");
+                } else {
+                    PTD->SetTZOffset(tz);
+                    NVS->SetTZOffset(tz);
+                    Serial.println("");
+                    Serial.println("Time Zone set.");
+                }
                 break;
             }
         case CLEAR:
             {
+                PTD->ZeroFile(wheel->Miles());
+                Serial.println("");
+                Serial.println("Trip File zeroed.");
                 break;
             }
         case UPLOAD:
             {
+                Serial.println("");
+                Serial.println("--Uploading File--");
+                PTD->UploadFile();
+                Serial.println("--UploadComplete--");
                 break;
             }
         case ZERO:
             {
+                wheel->ZeroMiles();
+                NVS->SetMiles(0.0);
+                PTD->SetTZOffset(0);
+                NVS->SetTZOffset(0);
+                NVS->commit();
+                Serial.println("");
+                Serial.println("EEProm cleared.");
                 break;
             }
         case HELP:
             {
+                Serial.println("");
                 int i, n = sizeof(HelpText) / sizeof(HelpText[0]);
                 for (i = 0; i < n && HelpText[i]; i++) {
                     Serial.println(HelpText[i]);

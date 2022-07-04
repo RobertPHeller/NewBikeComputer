@@ -8,7 +8,7 @@
 //  Author        : $Author$
 //  Created By    : Robert Heller
 //  Created       : Sun Jul 3 15:27:28 2022
-//  Last Modified : <220703.1645>
+//  Last Modified : <220704.1144>
 //
 //  Description	
 //
@@ -226,6 +226,38 @@ const char *PersistentTripDatabase::Heading()
 {
     snprintf(buffer_,sizeof(buffer_),headingFORMAT,angle_,alt_);
     return buffer_;
+}
+
+void PersistentTripDatabase::ZeroFile(float miles)
+{
+    if (mounted_)
+    {
+        tripfile_.close();
+        SPIFFS.remove("/spiffs/trips.list");
+        tripfile_ = SPIFFS.open("/spiffs/trips.list",FILE_APPEND,true);
+        UpdateTripRecord(miles,true);
+    }
+}
+
+void PersistentTripDatabase::UploadFile()
+{
+    if (mounted_)
+    {
+        uint8_t buffer[1024];
+        size_t bytesRead, remaining, contentLength;
+        tripfile_.close();
+        tripfile_ = SPIFFS.open("/spiffs/trips.list",FILE_READ,false);
+        contentLength = tripfile_.size();
+        Serial.print("Length: ");Serial.println(contentLength);
+        remaining = contentLength;
+        while (remaining > 0) {
+            bytesRead = tripfile_.read(buffer,sizeof(buffer));
+            Serial.write(buffer,bytesRead);
+            remaining -= bytesRead;
+        }
+        tripfile_.close();
+        tripfile_ = SPIFFS.open("/spiffs/trips.list",FILE_APPEND,false);
+    }
 }
 
 
