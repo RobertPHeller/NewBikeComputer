@@ -8,7 +8,7 @@
 //  Author        : $Author$
 //  Created By    : Robert Heller
 //  Created       : Sun Jul 3 15:06:18 2022
-//  Last Modified : <220704.1122>
+//  Last Modified : <220705.0916>
 //
 //  Description	
 //
@@ -55,9 +55,9 @@ class PersistentTripDatabase
 {
 private:
     static constexpr char tripFORMAT[] = "%2d,%2d,%4d,%02d,%02d,%02d,%3d,%4.1f,%c,%3d,%4.1f,%c,%5.1f,%9.1f,%10.2f";
-    static constexpr char timeHeaderFORMAT[] = "%2d/%2d/%4d %02d:%02d:%02d";
-    static constexpr char locFORMAT[] = "Loc: %3d %4.1f%c, %3d %4.1f%c";
-    static constexpr char headingFORMAT[] = "Heading: %5.1f Alt: %9.1f";
+    static constexpr char timeHeaderFORMAT[] = "%2d/%2d %02d:%02d:%02d";
+    static constexpr char locFORMAT[] = "%2d %3.0f%c, %3d %3.0f%c";
+    static constexpr char headingFORMAT[] = "H: %3.0f A: %7.0f";
 public:
     PersistentTripDatabase(Adafruit_GPS *gps) : gps_(gps)
     {

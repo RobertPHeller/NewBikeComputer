@@ -8,7 +8,7 @@
 //  Author        : $Author$
 //  Created By    : Robert Heller
 //  Created       : Sun Sep 15 16:01:45 2013
-//  Last Modified : <220701.1231>
+//  Last Modified : <220705.0923>
 //
 //  Description	
 //
@@ -33,7 +33,7 @@
 
 #include "Button.h"
 
-typedef enum {TimeAndSpeed=0, TimeAndDistance, NVRAMSlot} DisplayMode;
+typedef enum {TimeAndSpeed=0, TimeAndDistance} DisplayMode;
 
 DisplayMode operator++(DisplayMode &m);
 

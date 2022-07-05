@@ -8,7 +8,7 @@
 //  Author        : $Author$
 //  Created By    : Robert Heller
 //  Created       : Sun Sep 15 16:05:29 2013
-//  Last Modified : <220701.1248>
+//  Last Modified : <220705.0924>
 //
 //  Description	
 //
@@ -37,8 +37,7 @@ static const char rcsid[] = "@(#) : $Id$";
 DisplayMode operator++(DisplayMode &m) {
     switch (m) {
     case TimeAndSpeed: m=TimeAndDistance; break;
-    case TimeAndDistance: m=NVRAMSlot; break;
-    case NVRAMSlot: m=TimeAndSpeed; break;
+    case TimeAndDistance: m=TimeAndSpeed; break;
     }
     return m;
 }

@@ -8,7 +8,7 @@
 //  Author        : $Author$
 //  Created By    : Robert Heller
 //  Created       : Thu Jun 30 15:03:26 2022
-//  Last Modified : <220703.1731>
+//  Last Modified : <220705.0942>
 //
 //  Description	
 //
@@ -48,7 +48,8 @@ static const char rcsid[] = "@(#) : $Id$";
 #include <Adafruit_ST7789.h> // Hardware-specific library for ST7789
 #include <SPI.h>
 #include <Adafruit_GPS.h>
-#include <Fonts/FreeSans12pt7b.h>
+#include <Fonts/FreeMono12pt7b.h> // 13x14 (WxH) Spacing: 14 NL: 24 -- 17c x 5l
+#include <Fonts/FreeMono24pt7b.h> // 26x26 (WxH) Spacing: 28 NL: 47 -- 8c  x 2l
 #include <HardwareSerial.h>
 #include <FS.h>
 #include <SPIFFS.h>
@@ -114,8 +115,6 @@ void setup() {
     tft.init(135, 240); // Init ST7789 240x135
     tft.setRotation(3);
     tft.fillScreen(ST77XX_BLACK);
-    canvas.setFont(&FreeSans12pt7b);
-    canvas.setTextColor(ST77XX_WHITE);
     tripdatabase.begin(WheelSensor.Miles(),NVS.TZOffset());
     Serial.println("BikeComputer 0.0");
     Serial.print(">>");
@@ -137,20 +136,31 @@ void loop() {
     if (WheelSensor.CheckState()) {
         speed = WheelSensor.CurrentSpeed();
     }
+    DisplayMode mode = b1.CheckModeButton();
     tripdatabase.UpdateTripRecord(WheelSensor.Miles());
     canvas.fillScreen(ST77XX_BLACK);
-    canvas.setCursor(0, 25);
+    canvas.setFont(&FreeMono12pt7b);
+    canvas.setCursor(0, 10);
     canvas.setTextColor(ST77XX_RED);
     canvas.println(tripdatabase.TimeHeader());
     canvas.setTextColor(ST77XX_YELLOW);
     canvas.println(tripdatabase.Location());
     canvas.println(tripdatabase.Heading());
-    snprintf(buffer,sizeof(buffer),"%2d MPH    %4.1VBatt",speed,VBatt);
     canvas.setTextColor(ST77XX_WHITE);
+    canvas.setFont(&FreeMono24pt7b);
+    canvas.setCursor(0, 85);
+    switch (mode)
+    {
+    case TimeAndSpeed:
+        snprintf(buffer,sizeof(buffer),"%2d %4.1V",speed,VBatt);
+        break;
+    case TimeAndDistance:
+        snprintf(buffer,sizeof(buffer),"%6dM",WheelSensor.Miles());
+        break;
+    }
     canvas.println(buffer);
     tft.drawRGBBitmap(0, 0, canvas.getBuffer(), 240, 135);
     NVS.SetMiles(WheelSensor.Miles());
-    NVS.SetTZOffset(tripdatabase.TZOffset());
     NVS.commit();
     delay(100);
 }    
