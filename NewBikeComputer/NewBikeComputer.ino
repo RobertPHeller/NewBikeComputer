@@ -8,7 +8,7 @@
 //  Author        : $Author$
 //  Created By    : Robert Heller
 //  Created       : Thu Jun 30 15:03:26 2022
-//  Last Modified : <220705.0942>
+//  Last Modified : <220705.1541>
 //
 //  Description	
 //
@@ -80,7 +80,7 @@ GFXcanvas16 canvas(240, 135);
 
 PersistentTripDatabase tripdatabase(&GPS);
 
-const float VScale = (3.3*14.0)/4095.0;
+constexpr float VScale = 14.0/4095.0;
 
 static     char buffer[40];
 
