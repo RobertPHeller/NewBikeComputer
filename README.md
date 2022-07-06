@@ -45,6 +45,15 @@ NewBikeComputer/ -- this sub-directorty contains the Arduino code:
 - Wheelsensor.cpp Wheel sensor
 - Wheelsensor.h   Wheel sensor
 
-BikeHost/ -- this sub-directorty contains the host code
+Libraries needed: the Adafruit ST7735 and ST7789 library, the Adafruit GPS
+library, the Adafruit BusIO library, and the Adafruit GFX (the last two will 
+be pulled in by the first two).  If you use a LiPo battery and want to use the 
+internal battery monitor, you will need to modify the code and add the  
+Adafruit LC709203F library as well.
+
+BikeHost/ -- this sub-directorty contains the host code.  This is a Tcl/Tk 
+program that runs on a host computer to allow for some maintainance tasks and 
+to upload the trip file.  It is set up to build under Linux for a Linux 
+target.
 
 
