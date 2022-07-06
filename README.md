@@ -27,6 +27,7 @@ the code and leave off the 12V power supply, DC power jack, and the voltage
 divider resistors.
 
 NewBikeComputer_bb.png -- Breadboard image
+
 NewBikeComputer_Schematic.pdf -- Schematic
 
 NewBikeComputer/ -- this sub-directorty contains the Arduino code:
