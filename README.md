@@ -54,6 +54,7 @@ Adafruit LC709203F library as well.
 BikeHost/ -- this sub-directorty contains the host code.  This is a Tcl/Tk 
 program that runs on a host computer to allow for some maintainance tasks and 
 to upload the trip file.  It is set up to build under Linux for a Linux 
-target.
+target. Note: the Arduino Serial Monitor could also be used for these 
+functions. 
 
 
