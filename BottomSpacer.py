@@ -9,7 +9,7 @@
 #  Author        : $Author$
 #  Created By    : Robert Heller
 #  Created       : Mon Jul 18 16:00:26 2022
-#  Last Modified : <220805.0429>
+#  Last Modified : <220805.0459>
 #
 #  Description	
 #
@@ -62,8 +62,8 @@ class BoxBottomSpacer(object):
     _holeWidthSpacing = 47
     _holeLengthSpacing = 44.5
     _holeOD = 6
-    _holeID = 3
-    _cutoutXYWL = (10,14,45 , 60)
+    _holeID = 4
+    _cutoutXYWL = (14,10,60,41)
     def __init__(self,name,origin,thick=.25*25.4):
         self.name = name
         if not isinstance(origin,Base.Vector):
