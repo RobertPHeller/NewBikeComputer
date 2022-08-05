@@ -9,7 +9,7 @@
 #  Author        : $Author$
 #  Created By    : Robert Heller
 #  Created       : Mon Jul 18 16:00:26 2022
-#  Last Modified : <220718.1627>
+#  Last Modified : <220805.0409>
 #
 #  Description	
 #
@@ -63,6 +63,7 @@ class BoxBottomSpacer(object):
     _holeLengthSpacing = 44.5
     _holeOD = 6
     _holeID = 3
+    _cutoutXYWL = (10,14,45 , 60)
     def __init__(self,name,origin,thick=.25*25.4):
         self.name = name
         if not isinstance(origin,Base.Vector):
@@ -102,7 +103,11 @@ class BoxBottomSpacer(object):
             holev = self.holes[i]
             hole = Part.Face(Part.Wire(Part.makeCircle(self._holeID/2.0,holev))).extrude(ZThick)
             board = board.cut(hole)
-        self.board = board
+        self.board = board.cut(self._cutout(thick))
+    def _cutout(self,thick):
+        x,y,w,l = self._cutoutXYWL
+        corigin = self.origin.add(Base.Vector(x,y,0))
+        return Part.Makeplane(w,l,corigin).extrude(Base.Vector(0,0,thick))
     def show(self):
         doc = App.activeDocument()
         obj = doc.addObject("Part::Feature",self.name)
