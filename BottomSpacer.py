@@ -9,7 +9,7 @@
 #  Author        : $Author$
 #  Created By    : Robert Heller
 #  Created       : Mon Jul 18 16:00:26 2022
-#  Last Modified : <220805.0409>
+#  Last Modified : <220805.0429>
 #
 #  Description	
 #
@@ -107,7 +107,7 @@ class BoxBottomSpacer(object):
     def _cutout(self,thick):
         x,y,w,l = self._cutoutXYWL
         corigin = self.origin.add(Base.Vector(x,y,0))
-        return Part.Makeplane(w,l,corigin).extrude(Base.Vector(0,0,thick))
+        return Part.makePlane(w,l,corigin).extrude(Base.Vector(0,0,thick))
     def show(self):
         doc = App.activeDocument()
         obj = doc.addObject("Part::Feature",self.name)
