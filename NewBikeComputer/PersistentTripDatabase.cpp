@@ -8,7 +8,7 @@
 //  Author        : $Author$
 //  Created By    : Robert Heller
 //  Created       : Sun Jul 3 15:27:28 2022
-//  Last Modified : <220704.1144>
+//  Last Modified : <221016.0957>
 //
 //  Description	
 //
@@ -48,29 +48,37 @@ static const char rcsid[] = "@(#) : $Id$";
 #include <Adafruit_GPS.h>
 #include <HardwareSerial.h>
 #include <FS.h>
-#include <SPIFFS.h>
+#include <FFat.h>
 #include "PersistentTripDatabase.h"
 
 void PersistentTripDatabase::begin(float miles,int tzoffset)
 {
     tzoffset_ = tzoffset;
-    mounted_ = SPIFFS.begin(true);
+    mounted_ = FFat.begin(true);
     if (mounted_)
     {
-        Serial.println("/spiffs Mounted");
+        Serial.println("/ffat Mounted");
     }
     else
     {
-        Serial.println("/spiffs not Mounted");
+        Serial.println("/ffat not Mounted");
     }
-    if (mounted_)
+    // read data from the GPS
+    char c = gps_->read();
+    Serial.print("*** PersistentTripDatabase::begin(): gps_->read() returns ");
+    Serial.println(c);
+    // if a sentence is received, we can check the checksum, parse it...
+    unsigned MAX_LOOP = 100;
+    //while (!gps_->newNMEAreceived()&&MAX_LOOP-->0) {
+    //    //Serial.println("*** PersistentTripDatabase::begin(): newNMEAreceived() loop");
+    //    delay(100);
+    //}
+    if (gps_->newNMEAreceived())
     {
-        tripfile_ = SPIFFS.open("/spiffs/trips.list",FILE_APPEND,true);
-        // read data from the GPS
-        char c = gps_->read();
-        // if a sentence is received, we can check the checksum, parse it...
-        while (!gps_->newNMEAreceived()) {
-            delay(100);
+        //Serial.println(gps_->lastNMEA());
+        if (!gps_->parse(gps_->lastNMEA()))
+        {
+            return;
         }
         hours_ = gps_->hour + tzoffset_;
         minutes_ = gps_->minute;
@@ -121,6 +129,10 @@ void PersistentTripDatabase::begin(float miles,int tzoffset)
             angle_ = gps_->angle;
             alt_   = gps_->altitude;
         }
+    }
+    if (mounted_)
+    {
+        tripfile_ = FFat.open("/ffat/trips.list",FILE_APPEND,true);
         snprintf(buffer_,sizeof(buffer_),tripFORMAT,
                  month_,date_,hours_,minutes_,seconds_,latitude_.degrees,
                  latitude_.minutes,latitude_.direction,longitude_.degrees,
@@ -138,6 +150,10 @@ void PersistentTripDatabase::UpdateTripRecord(float miles,bool newtrip)
     char c = gps_->read();
     // if a sentence is received, we can check the checksum, parse it...
     if (gps_->newNMEAreceived()) {
+        if (!gps_->parse(gps_->lastNMEA()))
+        {
+            return;
+        }
         hours_ = gps_->hour + tzoffset_;
         minutes_ = gps_->minute;
         seconds_ = gps_->seconds;
@@ -188,6 +204,7 @@ void PersistentTripDatabase::UpdateTripRecord(float miles,bool newtrip)
             alt_   = gps_->altitude;
         }
     }
+    return;
     if (!mounted_) return;
     if (newtrip)
     {
@@ -195,7 +212,11 @@ void PersistentTripDatabase::UpdateTripRecord(float miles,bool newtrip)
     }
     else
     {
-        tripfile_.seek(lastline_);
+        auto rc = tripfile_.seek(lastline_,SeekSet);
+        //Serial.print("*** PersistentTripDatabase::UpdateTripRecord(): seek returns ");
+        //Serial.println(rc);
+        //Serial.print("*** PersistentTripDatabase::UpdateTripRecord(): position is now ");
+        //Serial.println(tripfile_.position());
     }
     snprintf(buffer_,sizeof(buffer_),tripFORMAT,
              month_,date_,hours_,minutes_,seconds_,latitude_.degrees,
@@ -233,8 +254,8 @@ void PersistentTripDatabase::ZeroFile(float miles)
     if (mounted_)
     {
         tripfile_.close();
-        SPIFFS.remove("/spiffs/trips.list");
-        tripfile_ = SPIFFS.open("/spiffs/trips.list",FILE_APPEND,true);
+        FFat.remove("/ffat/trips.list");
+        tripfile_ = FFat.open("/ffat/trips.list",FILE_APPEND,true);
         UpdateTripRecord(miles,true);
     }
 }
@@ -246,7 +267,7 @@ void PersistentTripDatabase::UploadFile()
         uint8_t buffer[1024];
         size_t bytesRead, remaining, contentLength;
         tripfile_.close();
-        tripfile_ = SPIFFS.open("/spiffs/trips.list",FILE_READ,false);
+        tripfile_ = FFat.open("/ffat/trips.list",FILE_READ,false);
         contentLength = tripfile_.size();
         Serial.print("Length: ");Serial.println(contentLength);
         remaining = contentLength;
@@ -256,7 +277,7 @@ void PersistentTripDatabase::UploadFile()
             remaining -= bytesRead;
         }
         tripfile_.close();
-        tripfile_ = SPIFFS.open("/spiffs/trips.list",FILE_APPEND,false);
+        tripfile_ = FFat.open("/ffat/trips.list",FILE_APPEND,false);
     }
 }
 

@@ -8,7 +8,7 @@
 //  Author        : $Author$
 //  Created By    : Robert Heller
 //  Created       : Thu Jun 30 15:03:26 2022
-//  Last Modified : <220705.1541>
+//  Last Modified : <221016.1002>
 //
 //  Description	
 //
@@ -52,7 +52,7 @@ static const char rcsid[] = "@(#) : $Id$";
 #include <Fonts/FreeMono24pt7b.h> // 26x26 (WxH) Spacing: 28 NL: 47 -- 8c  x 2l
 #include <HardwareSerial.h>
 #include <FS.h>
-#include <SPIFFS.h>
+#include <FFat.h>
 #include "Wheelsensor.h"
 #include "Button.h"
 #include "Modes.h"
@@ -86,6 +86,8 @@ static     char buffer[40];
 
 BikeNVS NVS;
 
+static int TickCounter = 0;
+
 void setup() {
     // put your setup code here, to run once:
     // Initialize serial first (so we can debug stuff)
@@ -98,8 +100,9 @@ void setup() {
     GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCGGA);
     // Set the update rate
     GPS.sendCommand(PMTK_SET_NMEA_UPDATE_1HZ);   // 1 Hz update rate
+    GPS.sendCommand(PGCMD_ANTENNA);
     delay(1000);
-    Serial.println(PMTK_Q_RELEASE);
+    GPS.println(PMTK_Q_RELEASE);
     WheelSensor.init(NVS.Miles());
     //analogReference(DEFAULT);
     // turn on backlite
@@ -119,6 +122,7 @@ void setup() {
     Serial.println("BikeComputer 0.0");
     Serial.print(">>");
     Serial.flush();
+    TickCounter = 0;
 }
 
 void loop() {
@@ -136,11 +140,12 @@ void loop() {
     if (WheelSensor.CheckState()) {
         speed = WheelSensor.CurrentSpeed();
     }
-    DisplayMode mode = b1.CheckModeButton();
+    //DisplayMode mode = b1.CheckModeButton();
+    DisplayMode mode = TimeAndSpeed;
     tripdatabase.UpdateTripRecord(WheelSensor.Miles());
     canvas.fillScreen(ST77XX_BLACK);
     canvas.setFont(&FreeMono12pt7b);
-    canvas.setCursor(0, 10);
+    canvas.setCursor(0, 18);
     canvas.setTextColor(ST77XX_RED);
     canvas.println(tripdatabase.TimeHeader());
     canvas.setTextColor(ST77XX_YELLOW);
@@ -148,19 +153,25 @@ void loop() {
     canvas.println(tripdatabase.Heading());
     canvas.setTextColor(ST77XX_WHITE);
     canvas.setFont(&FreeMono24pt7b);
-    canvas.setCursor(0, 85);
+    canvas.setCursor(0, 104);
+    //Serial.print("*** loop(): mode = "); Serial.println(mode);
     switch (mode)
     {
     case TimeAndSpeed:
-        snprintf(buffer,sizeof(buffer),"%2d %4.1V",speed,VBatt);
+        snprintf(buffer,sizeof(buffer),"%2d %4.1fV",speed,VBatt);
         break;
     case TimeAndDistance:
         snprintf(buffer,sizeof(buffer),"%6dM",WheelSensor.Miles());
         break;
     }
     canvas.println(buffer);
+    //Serial.println(buffer);
     tft.drawRGBBitmap(0, 0, canvas.getBuffer(), 240, 135);
-    NVS.SetMiles(WheelSensor.Miles());
-    NVS.commit();
+    TickCounter++;
+    if ((TickCounter % 1000) == 0)
+    {
+        NVS.SetMiles(WheelSensor.Miles());
+        NVS.commit();
+    }
     delay(100);
 }    

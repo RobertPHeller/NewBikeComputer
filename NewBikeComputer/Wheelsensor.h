@@ -8,7 +8,7 @@
 //  Author        : $Author$
 //  Created By    : Robert Heller
 //  Created       : Sun Sep 15 11:29:23 2013
-//  Last Modified : <220703.1738>
+//  Last Modified : <221015.2054>
 //
 //  Description	
 //
@@ -33,7 +33,16 @@
 
 class Wheelsensor {
 public:
-    Wheelsensor(uint8_t pin) : pin_(pin) { }
+    Wheelsensor(uint8_t pin) 
+                : lasttime(0)
+          , totalmiles(0)
+          , curspeed(0)
+          , lastDebounceTime(0)
+          , debounceDelay(0)
+          , lastButtonState(0)
+          , pin_(pin) 
+    { 
+    }
     bool CheckState();
     int CurrentSpeed() {return curspeed;}
     float Miles() {return totalmiles;}

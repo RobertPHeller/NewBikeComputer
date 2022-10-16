@@ -8,7 +8,7 @@
 //  Author        : $Author$
 //  Created By    : Robert Heller
 //  Created       : Sun Sep 15 17:56:32 2013
-//  Last Modified : <220704.1143>
+//  Last Modified : <221016.0934>
 //
 //  Description	
 //
@@ -37,6 +37,7 @@ static const char rcsid[] = "@(#) : $Id$";
 #include "PersistentTripDatabase.h"
 #include "BikeNVS.h"
 #include "Wheelsensor.h"
+#include "FFat.h"
 
 static const char *HelpText[] = {
     "New Bike Computer 1.0",
@@ -51,6 +52,8 @@ static const char *HelpText[] = {
     "  Clear tripfile",
     "Z",
     "  Zero NVS (miles, tzoffset)", 
+    "L",
+    "  List files",
     "H",
     "  Print this help",
     "",
@@ -65,8 +68,11 @@ void ProcessSerialCLI(PersistentTripDatabase *PTD,BikeNVS *NVS,
     
     if (Serial.available() > 0) {
         len = Serial.readBytesUntil('\r',buffer,sizeof(buffer)-1);
+        Serial.println(buffer);
         if (len == 0) return;
         buffer[len] = '\0';
+        Serial.print("*** ProcessSerialCLI(): command is ");
+        Serial.println(toupper(buffer[0]));
         switch ((Commands) (toupper(buffer[0]))) {
         case SET:
             {
@@ -108,6 +114,49 @@ void ProcessSerialCLI(PersistentTripDatabase *PTD,BikeNVS *NVS,
                 Serial.println("EEProm cleared.");
                 break;
             }
+        case LIST:
+            {
+                char buffer[128];
+                int count = 0;
+                Serial.println("");
+                Serial.print("*** ProcessSerialCLI() [LIST]: count initialized to ");
+                Serial.println(count);
+                File root = FFat.open("/ffat");
+                if (!root)
+                {
+                    Serial.println("Cannot open root file system directory!");
+                    break;
+                }
+                File f;
+                while (f = root.openNextFile())
+                {
+                    snprintf(buffer,sizeof(buffer),"%c %5d %s",
+                             f.isDirectory()? 'd': ' ',
+                             f.size(),
+                             f.name());
+                    Serial.println(buffer);
+                    count++;
+                    f.close();
+                }
+                root.close();
+                snprintf(buffer,sizeof(buffer),"%d files",count);
+                Serial.println(buffer);
+            }
+            break;
+        case REMOVE:
+            FFat.remove("/ffat/trips.list");
+            FFat.end();
+            PTD->begin(wheel->Miles(),NVS->TZOffset());
+            break;
+        case FORMAT:
+            FFat.end();
+            FFat.format();
+            PTD->begin(wheel->Miles(),NVS->TZOffset());
+            break;
+        case DUMP:
+            snprintf(buffer,sizeof(buffer),"Miles: %f, TZ: %d",NVS->Miles(),NVS->TZOffset());
+            Serial.println(buffer);
+            break;
         case HELP:
             {
                 Serial.println("");

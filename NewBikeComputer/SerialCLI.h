@@ -8,7 +8,7 @@
 //  Author        : $Author$
 //  Created By    : Robert Heller
 //  Created       : Sun Sep 15 17:54:59 2013
-//  Last Modified : <220703.1733>
+//  Last Modified : <221016.0932>
 //
 //  Description	
 //
@@ -38,7 +38,8 @@
 void ProcessSerialCLI(PersistentTripDatabase *PTD,BikeNVS *NVS,
                       Wheelsensor *wheel);
 
-typedef enum {SET='S', UPLOAD='U', CLEAR='C', ZERO='Z', HELP='H'} Commands;
+typedef enum {SET='S', UPLOAD='U', CLEAR='C', ZERO='Z', LIST='L', 
+    REMOVE = 'R', FORMAT = 'F', DUMP = 'D', HELP='H'} Commands;
 
 #endif // __SERIALCLI_H
 
