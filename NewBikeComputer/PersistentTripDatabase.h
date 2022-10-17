@@ -8,7 +8,7 @@
 //  Author        : $Author$
 //  Created By    : Robert Heller
 //  Created       : Sun Jul 3 15:06:18 2022
-//  Last Modified : <221015.2111>
+//  Last Modified : <221017.1642>
 //
 //  Description	
 //
@@ -49,7 +49,7 @@
 #include <Adafruit_GPS.h>
 #include <HardwareSerial.h>
 #include <FS.h>
-#include <FFat.h>
+#include <SPIFFS.h>
 
 class PersistentTripDatabase
 {
@@ -78,7 +78,7 @@ public:
         longitude_.direction = ' ';
     }
     void begin(float miles,int tzoffset = 0);
-    void UpdateTripRecord(float miles,bool newtrip = false);
+    void UpdateTripRecord(float miles,bool newtrip = false, bool final = false);
     const char *TimeHeader();
     const char *Location();
     const char *Heading();

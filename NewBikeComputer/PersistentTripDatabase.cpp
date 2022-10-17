@@ -8,7 +8,7 @@
 //  Author        : $Author$
 //  Created By    : Robert Heller
 //  Created       : Sun Jul 3 15:27:28 2022
-//  Last Modified : <221016.0957>
+//  Last Modified : <221017.1748>
 //
 //  Description	
 //
@@ -48,25 +48,29 @@ static const char rcsid[] = "@(#) : $Id$";
 #include <Adafruit_GPS.h>
 #include <HardwareSerial.h>
 #include <FS.h>
-#include <FFat.h>
+#include <SPIFFS.h>
 #include "PersistentTripDatabase.h"
 
 void PersistentTripDatabase::begin(float miles,int tzoffset)
 {
     tzoffset_ = tzoffset;
-    mounted_ = FFat.begin(true);
+    mounted_ = SPIFFS.begin(true);
     if (mounted_)
     {
-        Serial.println("/ffat Mounted");
+        Serial.println("/spiffs Mounted");
     }
     else
     {
-        Serial.println("/ffat not Mounted");
+        Serial.println("/spiffs not Mounted");
     }
     // read data from the GPS
     char c = gps_->read();
-    Serial.print("*** PersistentTripDatabase::begin(): gps_->read() returns ");
-    Serial.println(c);
+    while (c && c != '\n')
+    {
+        c = gps_->read();
+    }
+    //Serial.print("*** PersistentTripDatabase::begin(): gps_->read() returns ");
+    //Serial.println(c);
     // if a sentence is received, we can check the checksum, parse it...
     unsigned MAX_LOOP = 100;
     //while (!gps_->newNMEAreceived()&&MAX_LOOP-->0) {
@@ -75,7 +79,7 @@ void PersistentTripDatabase::begin(float miles,int tzoffset)
     //}
     if (gps_->newNMEAreceived())
     {
-        //Serial.println(gps_->lastNMEA());
+        Serial.println(gps_->lastNMEA());
         if (!gps_->parse(gps_->lastNMEA()))
         {
             return;
@@ -132,7 +136,7 @@ void PersistentTripDatabase::begin(float miles,int tzoffset)
     }
     if (mounted_)
     {
-        tripfile_ = FFat.open("/ffat/trips.list",FILE_APPEND,true);
+        tripfile_ = SPIFFS.open("/spiffs/trips.list","a+",true);
         snprintf(buffer_,sizeof(buffer_),tripFORMAT,
                  month_,date_,hours_,minutes_,seconds_,latitude_.degrees,
                  latitude_.minutes,latitude_.direction,longitude_.degrees,
@@ -144,12 +148,18 @@ void PersistentTripDatabase::begin(float miles,int tzoffset)
     }
 }
 
-void PersistentTripDatabase::UpdateTripRecord(float miles,bool newtrip)
+void PersistentTripDatabase::UpdateTripRecord(float miles,bool newtrip,
+                                              bool final)
 {
     // read data from the GPS
     char c = gps_->read();
+    while (c && c != '\n')
+    {
+        c = gps_->read();
+    }
     // if a sentence is received, we can check the checksum, parse it...
     if (gps_->newNMEAreceived()) {
+        Serial.println(gps_->lastNMEA());
         if (!gps_->parse(gps_->lastNMEA()))
         {
             return;
@@ -204,7 +214,7 @@ void PersistentTripDatabase::UpdateTripRecord(float miles,bool newtrip)
             alt_   = gps_->altitude;
         }
     }
-    return;
+    if (!final) return;
     if (!mounted_) return;
     if (newtrip)
     {
@@ -254,8 +264,8 @@ void PersistentTripDatabase::ZeroFile(float miles)
     if (mounted_)
     {
         tripfile_.close();
-        FFat.remove("/ffat/trips.list");
-        tripfile_ = FFat.open("/ffat/trips.list",FILE_APPEND,true);
+        SPIFFS.remove("/spiffs/trips.list");
+        tripfile_ = SPIFFS.open("/spiffs/trips.list",FILE_APPEND,true);
         UpdateTripRecord(miles,true);
     }
 }
@@ -267,7 +277,7 @@ void PersistentTripDatabase::UploadFile()
         uint8_t buffer[1024];
         size_t bytesRead, remaining, contentLength;
         tripfile_.close();
-        tripfile_ = FFat.open("/ffat/trips.list",FILE_READ,false);
+        tripfile_ = SPIFFS.open("/spiffs/trips.list",FILE_READ,false);
         contentLength = tripfile_.size();
         Serial.print("Length: ");Serial.println(contentLength);
         remaining = contentLength;
@@ -277,7 +287,7 @@ void PersistentTripDatabase::UploadFile()
             remaining -= bytesRead;
         }
         tripfile_.close();
-        tripfile_ = FFat.open("/ffat/trips.list",FILE_APPEND,false);
+        tripfile_ = SPIFFS.open("/spiffs/trips.list",FILE_APPEND,false);
     }
 }
 

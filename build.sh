@@ -19,7 +19,7 @@ $ARDUINOINSTALLDIR/arduino-builder -compile \
     -tools $HOME/.arduino15/packages \
     -built-in-libraries $ARDUINOINSTALLDIR/libraries \
     -libraries $HOME/Arduino/libraries \
-    -fqbn=esp32:esp32:adafruit_feather_esp32s3_tft:USBMode=default,CDCOnBoot=cdc,MSCOnBoot=default,DFUOnBoot=default,PSRAM=enabled,PartitionScheme=default,CPUFreq=240,FlashFreq=80,UploadSpeed=921600,DebugLevel=none -ide-version=10813 \
+    -fqbn=esp32:esp32:adafruit_feather_esp32s3_tft:USBMode=default,CDCOnBoot=cdc,MSCOnBoot=default,DFUOnBoot=default,PSRAM=enabled,PartitionScheme=default,CPUFreq=240,FlashFreq=80,UploadSpeed=115200,DebugLevel=none -ide-version=10813 \
     -build-path $BUILDPATH \
     -warnings=none \
     -build-cache $CACHEPATH \

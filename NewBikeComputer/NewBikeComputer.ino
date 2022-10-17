@@ -8,7 +8,7 @@
 //  Author        : $Author$
 //  Created By    : Robert Heller
 //  Created       : Thu Jun 30 15:03:26 2022
-//  Last Modified : <221016.1002>
+//  Last Modified : <221017.1655>
 //
 //  Description	
 //
@@ -52,7 +52,7 @@ static const char rcsid[] = "@(#) : $Id$";
 #include <Fonts/FreeMono24pt7b.h> // 26x26 (WxH) Spacing: 28 NL: 47 -- 8c  x 2l
 #include <HardwareSerial.h>
 #include <FS.h>
-#include <FFat.h>
+#include <SPIFFS.h>
 #include "Wheelsensor.h"
 #include "Button.h"
 #include "Modes.h"
@@ -140,9 +140,13 @@ void loop() {
     if (WheelSensor.CheckState()) {
         speed = WheelSensor.CurrentSpeed();
     }
-    //DisplayMode mode = b1.CheckModeButton();
     DisplayMode mode = TimeAndSpeed;
-    tripdatabase.UpdateTripRecord(WheelSensor.Miles());
+    //DisplayMode mode = b1.CheckModeButton();
+    bool newtrip = false;
+    // if (b2.Pressed()) newtrip = true;
+    bool final   = false;
+    // if (b3.Pressed()) final = true;
+    tripdatabase.UpdateTripRecord(WheelSensor.Miles(),newtrip,final);
     canvas.fillScreen(ST77XX_BLACK);
     canvas.setFont(&FreeMono12pt7b);
     canvas.setCursor(0, 18);
