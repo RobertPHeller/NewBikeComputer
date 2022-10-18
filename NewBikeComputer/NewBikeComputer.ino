@@ -8,7 +8,7 @@
 //  Author        : $Author$
 //  Created By    : Robert Heller
 //  Created       : Thu Jun 30 15:03:26 2022
-//  Last Modified : <221017.1655>
+//  Last Modified : <221018.1304>
 //
 //  Description	
 //
@@ -100,9 +100,10 @@ void setup() {
     GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCGGA);
     // Set the update rate
     GPS.sendCommand(PMTK_SET_NMEA_UPDATE_1HZ);   // 1 Hz update rate
+    GPS.sendCommand(PMTK_API_SET_FIX_CTL_100_MILLIHERTZ);
     GPS.sendCommand(PGCMD_ANTENNA);
     delay(1000);
-    GPS.println(PMTK_Q_RELEASE);
+    GPS.sendCommand(PMTK_Q_RELEASE);
     WheelSensor.init(NVS.Miles());
     //analogReference(DEFAULT);
     // turn on backlite
